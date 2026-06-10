@@ -72,7 +72,7 @@ function playAlarmSound() {
 }
 
 function launchParticles() {
-  const colors = ["#1f7a6d", "#f2b84b", "#e85d75", "#3f83f8", "#7c5cff"];
+  const colors = ["#35ffad", "#ff4fd8", "#ffffff", "#9affd6", "#ff9be8"];
   const particleCount = 72;
 
   for (let index = 0; index < particleCount; index += 1) {
@@ -112,7 +112,7 @@ function startTimer() {
   }
 
   if (remainingSeconds <= 0) {
-    setStatus("請先輸入大於 0 的時間。", true);
+    setStatus("請輸入大於 0 的時間", true);
     updateDisplay();
     return;
   }
@@ -141,7 +141,7 @@ function pauseTimer() {
 
   stopTimer();
   startBtn.disabled = false;
-  setStatus("已暫停。");
+  setStatus("已暫停");
 }
 
 function resetTimer() {
@@ -149,7 +149,7 @@ function resetTimer() {
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
   startBtn.disabled = false;
-  setStatus("已重設。");
+  setStatus("已重設");
   updateDisplay();
 }
 
@@ -160,7 +160,7 @@ function syncFromInputs() {
 
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
-  setStatus("設定時間後按開始。");
+  setStatus("設定時間後按開始");
   updateDisplay();
 }
 
