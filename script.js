@@ -11,6 +11,15 @@ let totalSeconds = getInputSeconds();
 let remainingSeconds = totalSeconds;
 let timerId = null;
 let audioContext = null;
+let preferredVoice = null;
+let lastSpokenSecond = null;
+const countdownWords = {
+  1: "一",
+  2: "二",
+  3: "三",
+  4: "四",
+  5: "五"
+};
 
 function getInputSeconds() {
   const minutes = Math.max(0, Number(minutesInput.value) || 0);
@@ -37,6 +46,48 @@ function setStatus(message, isDone = false) {
 function stopTimer() {
   clearInterval(timerId);
   timerId = null;
+}
+
+function loadPreferredVoice() {
+  if (!("speechSynthesis" in window)) {
+    return;
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+  preferredVoice =
+    voices.find((voice) => voice.lang === "zh-TW" && voice.name.includes("Google")) ||
+    voices.find((voice) => voice.lang.startsWith("zh") && voice.name.includes("Google")) ||
+    voices.find((voice) => voice.lang === "zh-TW") ||
+    voices.find((voice) => voice.lang.startsWith("zh")) ||
+    null;
+}
+
+function prepareSpeech() {
+  if (!("speechSynthesis" in window)) {
+    return;
+  }
+
+  loadPreferredVoice();
+}
+
+function speakCountdown(second) {
+  if (!("speechSynthesis" in window) || !countdownWords[second] || lastSpokenSecond === second) {
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(countdownWords[second]);
+  utterance.lang = "zh-TW";
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
+
+  lastSpokenSecond = second;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
 }
 
 function prepareAudio() {
@@ -105,10 +156,12 @@ function startTimer() {
   }
 
   prepareAudio();
+  prepareSpeech();
 
   if (remainingSeconds <= 0) {
     totalSeconds = getInputSeconds();
     remainingSeconds = totalSeconds;
+    lastSpokenSecond = null;
   }
 
   if (remainingSeconds <= 0) {
@@ -119,10 +172,12 @@ function startTimer() {
 
   setStatus("倒數中...");
   startBtn.disabled = true;
+  speakCountdown(remainingSeconds);
 
   timerId = setInterval(() => {
     remainingSeconds -= 1;
     updateDisplay();
+    speakCountdown(remainingSeconds);
 
     if (remainingSeconds <= 0) {
       stopTimer();
@@ -140,14 +195,17 @@ function pauseTimer() {
   }
 
   stopTimer();
+  window.speechSynthesis?.cancel();
   startBtn.disabled = false;
   setStatus("已暫停。");
 }
 
 function resetTimer() {
   stopTimer();
+  window.speechSynthesis?.cancel();
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
+  lastSpokenSecond = null;
   startBtn.disabled = false;
   setStatus("已重設。");
   updateDisplay();
@@ -160,8 +218,14 @@ function syncFromInputs() {
 
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
+  lastSpokenSecond = null;
   setStatus("設定時間後按開始。");
   updateDisplay();
+}
+
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.addEventListener("voiceschanged", loadPreferredVoice);
+  loadPreferredVoice();
 }
 
 startBtn.addEventListener("click", startTimer);
