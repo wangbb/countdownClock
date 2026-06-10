@@ -23,6 +23,46 @@ body {
     var(--bg);
 }
 
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--particle-color);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(0deg) scale(0.8);
+  animation: burst 900ms ease-out forwards;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.9);
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+      rotate(var(--rotate))
+      scale(0.2);
+  }
+}
+
 button,
 input {
   font: inherit;

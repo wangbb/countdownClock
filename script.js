@@ -5,6 +5,7 @@ const statusText = document.querySelector("#status");
 const startBtn = document.querySelector("#start-btn");
 const pauseBtn = document.querySelector("#pause-btn");
 const resetBtn = document.querySelector("#reset-btn");
+const particleLayer = document.querySelector("#particle-layer");
 
 let totalSeconds = getInputSeconds();
 let remainingSeconds = totalSeconds;
@@ -70,6 +71,34 @@ function playAlarmSound() {
   });
 }
 
+function launchParticles() {
+  const colors = ["#1f7a6d", "#f2b84b", "#e85d75", "#3f83f8", "#7c5cff"];
+  const particleCount = 72;
+
+  for (let index = 0; index < particleCount; index += 1) {
+    const particle = document.createElement("span");
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 90 + Math.random() * 230;
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+    const size = 6 + Math.random() * 9;
+
+    particle.className = "particle";
+    particle.style.setProperty("--x", `${x}px`);
+    particle.style.setProperty("--y", `${y}px`);
+    particle.style.setProperty("--rotate", `${Math.random() * 720}deg`);
+    particle.style.setProperty("--particle-color", colors[index % colors.length]);
+    particle.style.left = `${45 + Math.random() * 10}%`;
+    particle.style.top = `${42 + Math.random() * 14}%`;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.animationDelay = `${Math.random() * 120}ms`;
+
+    particleLayer.appendChild(particle);
+    particle.addEventListener("animationend", () => particle.remove());
+  }
+}
+
 function startTimer() {
   if (timerId) {
     return;
@@ -100,6 +129,7 @@ function startTimer() {
       startBtn.disabled = false;
       setStatus("時間到！", true);
       playAlarmSound();
+      launchParticles();
     }
   }, 1000);
 }
