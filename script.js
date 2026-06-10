@@ -9,6 +9,7 @@ const resetBtn = document.querySelector("#reset-btn");
 let totalSeconds = getInputSeconds();
 let remainingSeconds = totalSeconds;
 let timerId = null;
+let audioContext = null;
 
 function getInputSeconds() {
   const minutes = Math.max(0, Number(minutesInput.value) || 0);
@@ -37,10 +38,44 @@ function stopTimer() {
   timerId = null;
 }
 
+function prepareAudio() {
+  audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+}
+
+function playAlarmSound() {
+  prepareAudio();
+
+  const now = audioContext.currentTime;
+  const notes = [880, 660, 880];
+
+  notes.forEach((frequency, index) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const startTime = now + index * 0.22;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    gain.gain.setValueAtTime(0.001, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, startTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.18);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + 0.2);
+  });
+}
+
 function startTimer() {
   if (timerId) {
     return;
   }
+
+  prepareAudio();
 
   if (remainingSeconds <= 0) {
     totalSeconds = getInputSeconds();
@@ -64,6 +99,7 @@ function startTimer() {
       stopTimer();
       startBtn.disabled = false;
       setStatus("時間到！", true);
+      playAlarmSound();
     }
   }, 1000);
 }
