@@ -112,12 +112,12 @@ function startTimer() {
   }
 
   if (remainingSeconds <= 0) {
-    setStatus("請輸入大於 0 的時間", true);
+    setStatus("\u8acb\u8f38\u5165\u5927\u65bc 0 \u7684\u6642\u9593", true);
     updateDisplay();
     return;
   }
 
-  setStatus("倒數中...");
+  setStatus("\u5012\u6578\u4e2d...");
   startBtn.disabled = true;
 
   timerId = setInterval(() => {
@@ -127,7 +127,7 @@ function startTimer() {
     if (remainingSeconds <= 0) {
       stopTimer();
       startBtn.disabled = false;
-      setStatus("時間到！", true);
+      setStatus("\u6642\u9593\u5230\uff01", true);
       playAlarmSound();
       launchParticles();
     }
@@ -141,7 +141,7 @@ function pauseTimer() {
 
   stopTimer();
   startBtn.disabled = false;
-  setStatus("已暫停");
+  setStatus("\u5df2\u66ab\u505c");
 }
 
 function resetTimer() {
@@ -149,7 +149,7 @@ function resetTimer() {
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
   startBtn.disabled = false;
-  setStatus("已重設");
+  setStatus("\u5df2\u91cd\u8a2d");
   updateDisplay();
 }
 
@@ -160,7 +160,7 @@ function syncFromInputs() {
 
   totalSeconds = getInputSeconds();
   remainingSeconds = totalSeconds;
-  setStatus("設定時間後按開始");
+  setStatus("\u8a2d\u5b9a\u6642\u9593\u5f8c\u6309\u958b\u59cb");
   updateDisplay();
 }
 
